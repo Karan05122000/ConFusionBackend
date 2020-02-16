@@ -18,13 +18,24 @@ const Dishes = require('./models/dishes');
 var config = require('./config');
 const url = config.mongoUrl;
 const connect = mongoose.connect(url);
+const uploadRouter = require('./routes/uploadRouter');
 
 connect.then((db) => {
   console.log("Connected correctly to server");
 }, (err) => { console.log(err); });
 // view engine setup
+// Secure traffic only
+app.all('*', (req, res, next) => {
+  if (req.secure) {
+    return next();
+  }
+  else {
+    res.redirect(307, 'https://' + req.hostname + ':' + app.get('secPort') + req.url);
+  }
+});
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+app.use('/imageUpload',uploadRouter);
 
 app.use(passport.initialize());
 app.use(passport.session());
