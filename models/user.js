@@ -14,7 +14,8 @@ var User = new Schema ({
       admin:   {
           type: Boolean,
           default: false
-      }
+      },
+      FaceBookId:String,
 });
 User.plugin(passportLocalMongoose);
 module.exports = mongoose.model('User',User);
