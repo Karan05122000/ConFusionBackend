@@ -10,7 +10,7 @@ const cors = require('./cors');
 promoRouter.route('/')
 .options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
 .get(cors.cors,authenticate.verifyUser,(req,res,next) => {
-    Promotions.find({})
+    Promotions.find(req.query)
     .then((promotions) =>{
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');

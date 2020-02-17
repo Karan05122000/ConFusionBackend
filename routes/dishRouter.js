@@ -11,7 +11,7 @@ dishRouter.route('/')
 .options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
 .get(cors.cors,authenticate.verifyUser,(req,res,next) =>{
     //res.statusCode = 200;
-    Dishes.find({})
+    Dishes.find(req.query)
     .populate('comments.author')
     .then((dishes) =>{
         res.statusCode = 200;
