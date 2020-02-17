@@ -7,7 +7,7 @@ var authenticate = require('../authenticate');
 promoRouter.use(bodyParser.json());
 
 promoRouter.route('/')
-.get((req,res,next) => {
+.get(authenticate.verifyUser,(req,res,next) => {
     Promotions.find({})
     .then((promotions) =>{
         res.statusCode = 200;
@@ -15,7 +15,7 @@ promoRouter.route('/')
         res.json(promotions);
     },(err) => next(err))
     .catch((err) => next(err));})
-.post(authenticate.verifyUser,(req,res,next) =>{
+.post(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next) =>{
     Promotions.create(req.body)
     .then((promo) => {
         console.log('Dish Created ', promo);
@@ -25,11 +25,11 @@ promoRouter.route('/')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.put(authenticate.verifyUser,(req,res,next) =>{
+.put(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next) =>{
     res.statusCode=403;
     res.end('PUT operation not supported on /promo');
 })
-.delete(authenticate.verifyUser,(req,res,next) =>{
+.delete(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next) =>{
     Promotions.remove({})
     .then((resp) => {
         res.statusCode = 200;
@@ -39,7 +39,7 @@ promoRouter.route('/')
     .catch((err) => next(err));});
 
 promoRouter.route('/:promoId')
-.get((req,res,next) =>{
+.get(authenticate.verifyUser,(req,res,next) =>{
     Promotions.findById(req.params.promoId)
     .then((promo) =>{
         res.statusCode = 200;
@@ -48,11 +48,11 @@ promoRouter.route('/:promoId')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.post(authenticate.verifyUser,(req,res,next) =>{
+.post(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next) =>{
     res.statusCode = 403;
     res.end('POST operation not supported on /promo/'+req.params.promoId);
 })
-.put(authenticate.verifyUser,(req,res,next) =>{
+.put(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next) =>{
     Promotions.findByIdAndUpdate(req.params.promoId,{
         $set: req.body
     },{new: true})
@@ -63,7 +63,7 @@ promoRouter.route('/:promoId')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.delete(authenticate.verifyUser,(req,res,next) =>{
+.delete(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next) =>{
     Promotions.findByIdAndRemove(req.params.promoId)
     .then((promo) =>{
         res.statusCode = 200;

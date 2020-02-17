@@ -36,4 +36,36 @@ exports.jwtPassport = passport.use(new JwtStrategy(opts,
 }));
 
 exports.verifyUser = passport.authenticate('jwt', {session:'false'});  
-exports.verifyAdmin 
+exports.verifyAdmin = (req,res,next) =>{
+    var token = req.body.token || req.query.token || req.headers['x-access-token'];
+    if(token)
+    {
+        jwt.verify(token,config.secretKey,(err,decoded) =>{
+            if(err){
+                var err = new Error('You are not authenticated!');
+                err.status = 401;
+                return next(err);
+            }
+            else
+            {
+                var flag = req.decoded._doc.admin;
+                if(flag)
+                {
+                    next();
+                }
+                else
+                {
+                    var err = new Error('You are not authorized to perform this operation');
+                     err.status = 403;
+                     return next(err);
+                }
+            }
+        });
+    }
+    else
+    {
+        var err = new Error('No token provided-Admin!');
+        err.status = 403;
+        return next(err);
+    }
+};
